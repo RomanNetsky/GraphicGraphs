@@ -19,6 +19,8 @@ namespace graphical_graph_editor
         Node selectedNode;
 
         Node selected = null;
+        Boolean mousePressed = false;
+        Boolean mPressAndSelectedG = false;
 
         public Form1()
         {
@@ -50,6 +52,8 @@ namespace graphical_graph_editor
 
         private void Form1_MouseDown(object sender, MouseEventArgs e)
         {
+            mousePressed = true;
+            
             int x, y;
             int find = 0;
             Node node = null;
@@ -116,14 +120,29 @@ namespace graphical_graph_editor
                         selected = null;
                     }
                 }   
-            }
-
-            
-
-            
+            }            
             Invalidate();
         }
 
+        private void Form1_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                //left mouse button released
+
+                mousePressed = false;
+            }
+        }
+
+        private void Form1_MouseMove(object sender, MouseEventArgs e)
+        {
+            if(mousePressed = true && e.Button == MouseButtons.Left && selected != null )
+            {
+                    selected.X = e.X;
+                    selected.Y = e.Y;
+                    Invalidate();
+            }
+        }
 
         public void eliminateNexetEdges(Node node)
         {
@@ -227,9 +246,7 @@ namespace graphical_graph_editor
         }
 
         public class Line
-        {
-            int x1, y1, x2, y2, node1, node2;
-
+        {    
             Node client = null;
             Node server = null;
             int remainingInt;
@@ -262,10 +279,7 @@ namespace graphical_graph_editor
             Invalidate();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
-        }
+      
     }//Form
 }//namespace
 
