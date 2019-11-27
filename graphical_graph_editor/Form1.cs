@@ -71,7 +71,6 @@ namespace graphical_graph_editor
                 {                    
                     if (selected == null)
                     {
-                        //MessageBox.Show("Selecting");
                         node.Color = Color.Blue;
                         selectedNode = selected = node;                        
                     }
@@ -79,7 +78,6 @@ namespace graphical_graph_editor
                     {
                         if (selected != node)
                         {
-                            //MessageBox.Show("conecting nodes");
                             Line linea = new Line(selected,node);
                             Lines.Add(linea);
                             selected = null;
