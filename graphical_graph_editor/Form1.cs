@@ -21,6 +21,7 @@ namespace graphical_graph_editor
         Node selected = null;
         Boolean mousePressed = false;
         Boolean mPressAndSelectedG = false;
+        int radio = 30;
 
         public Form1()
         {
@@ -43,10 +44,10 @@ namespace graphical_graph_editor
             }
             foreach (Node node in Nodes)
             {
-                rectangle = new Rectangle(node.X - 50, node.Y - 50, 100, 100);
+                rectangle = new Rectangle(node.X - radio, node.Y - radio, radio*2, radio*2);
                 graphics.FillEllipse(brush, rectangle);
                 pen = new Pen(node.Color, 5);
-                graphics.DrawEllipse(pen, node.X - 50, node.Y - 50, 100, 100);
+                graphics.DrawEllipse(pen, node.X - radio, node.Y - radio, radio*2, radio*2);
             }
         }
 
@@ -64,7 +65,7 @@ namespace graphical_graph_editor
                 {
                     x = oneNode.X;
                     y = oneNode.Y;
-                    if (e.X > x - 50 && e.X < x + 50 && e.Y > y - 50 && e.Y < y + 50)
+                    if (e.X > x - radio && e.X < x + radio && e.Y > y - radio && e.Y < y + radio)
                     {
                         find = 1;
                         node = oneNode;
@@ -105,7 +106,7 @@ namespace graphical_graph_editor
                 {
                     x = oneNode.X;
                     y = oneNode.Y;
-                    if (e.X > x - 50 && e.X < x + 50 && e.Y > y - 50 && e.Y < y + 50)
+                    if (e.X > x - radio && e.X < x + radio && e.Y > y - radio && e.Y < y + radio)
                     {
                         find = 1;
                         node = oneNode;
@@ -128,20 +129,18 @@ namespace graphical_graph_editor
         {
             if (e.Button == MouseButtons.Left)
             {
-                //left mouse button released
-
                 mousePressed = false;
             }
         }
 
         private void Form1_MouseMove(object sender, MouseEventArgs e)
         {
-            if(mousePressed = true && e.Button == MouseButtons.Left && selected != null )
+            if(mousePressed == true && e.Button == MouseButtons.Left && selected != null )
             {
                     selected.X = e.X;
                     selected.Y = e.Y;
                     Invalidate();
-            }
+            }            
         }
 
         public void eliminateNexetEdges(Node node)
@@ -249,6 +248,9 @@ namespace graphical_graph_editor
         {    
             Node client = null;
             Node server = null;
+
+            float m;
+            float b;
             int remainingInt;
 
             public Line(Node client, Node server)
