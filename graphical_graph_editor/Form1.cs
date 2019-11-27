@@ -29,7 +29,6 @@ namespace graphical_graph_editor
             Nodes = new List<Node>();
             Lines = new List<Line>();
             selectedNode = new Node();
-
         }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
@@ -162,6 +161,7 @@ namespace graphical_graph_editor
             string[] auxiliar;
             StreamReader sr = null;
             OpenFileDialog openFileDialog = new OpenFileDialog();
+     
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
@@ -177,12 +177,31 @@ namespace graphical_graph_editor
                 }
                 while (sr != null && !sr.EndOfStream)
                 {
+                    Node server = new Node();
+                    Node client = new Node();
                     auxiliar = sr.ReadLine().Split(',');
-                    int nodo1 = int.Parse(auxiliar[0]);
-                    int nodo2 = int.Parse(auxiliar[1]);
+                    int nodo1X = int.Parse(auxiliar[0]);
+                    int nodo1Y = int.Parse(auxiliar[1]);
+                    int nodo2X = int.Parse(auxiliar[2]);
+                    int nodo2Y = int.Parse(auxiliar[3]);                    
+               
+                    foreach (Node node in Nodes)
+                    {
+                        if (node.X == nodo1X && node.Y == nodo1Y)//it just can be one of all
+                        {
+                            server = node;
+                        }
+                        else
+                        {
+                            if (node.X == nodo2X && node.Y == nodo2Y)//it also can be just one of all
+                            {
+                                client = node;
+                            }
+                        }                        
+                    }
+                    Line linea = new Line(server, client);
+                    Lines.Add(linea);
 
-                    //Line linea = new Line(Nodes[nodo1].X, Nodes[nodo1].Y, Nodes[nodo2].X, Nodes[nodo2].Y, nodo1, nodo2);
-                    //Lines.Add(linea);
                 }
                 sr.Close();
             }
@@ -207,7 +226,7 @@ namespace graphical_graph_editor
             sw.WriteLine("Lines");
             foreach (Line line in Lines)
             {
-                sw.WriteLine(line.Node1 + "," + line.Node2);
+                sw.WriteLine(line.Node1.X + "," + line.Node1.Y + ","+ line.Node2.X + "," + line.Node2.Y);
             }
             sw.Close();
         }
