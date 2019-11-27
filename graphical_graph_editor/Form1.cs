@@ -20,7 +20,8 @@ namespace graphical_graph_editor
 
         Node selected = null;
         Boolean mousePressed = false;
-        Boolean mPressAndSelectedG = false;
+        
+        Boolean justSaved = true;
         int radio = 30;
 
         public Form1()
@@ -52,6 +53,7 @@ namespace graphical_graph_editor
 
         private void Form1_MouseDown(object sender, MouseEventArgs e)
         {
+            justSaved = false;
             mousePressed = true;
             
             int x, y;
@@ -229,6 +231,7 @@ namespace graphical_graph_editor
                 sw.WriteLine(line.Node1.X + "," + line.Node1.Y + ","+ line.Node2.X + "," + line.Node2.Y);
             }
             sw.Close();
+            justSaved = true;
         }
 
         public class Node
@@ -250,7 +253,6 @@ namespace graphical_graph_editor
             {
                 this.X = x;
                 this.Y = y;
-                this.index = index;
                 color = Color.Black;
             }
 
@@ -267,10 +269,6 @@ namespace graphical_graph_editor
         {    
             Node client = null;
             Node server = null;
-
-            float m;
-            float b;
-            int remainingInt;
 
             public Line(Node client, Node server)
             {
@@ -294,13 +292,53 @@ namespace graphical_graph_editor
 
         private void ToolStripLabel2_Click(object sender, EventArgs e)
         {
-            Nodes.Clear();
-            Lines.Clear();
-            openFile();
+            if(justSaved == false)
+            {
+                SaveChangesWindow gdc = new SaveChangesWindow();
+                gdc.ShowDialog();
+                if (gdc.Operation == 1 || gdc.Operation == 2)
+                {
+                    if (gdc.Operation == 1)
+                    {
+                        saveFile();
+                    }
+
+                    foreach (Node node in Nodes)
+                    {
+                        eliminateNexetEdges(node);
+                    }
+                    Nodes = new List<Node>();
+                    justSaved = true;
+                    openFile();
+                    
+                }
+            }
             Invalidate();
         }
 
-      
+        private void ToolStripLabel3_Click(object sender, EventArgs e)
+        {
+            if(justSaved == false)
+            {
+                SaveChangesWindow gdc = new SaveChangesWindow();
+                gdc.ShowDialog();
+                if (gdc.Operation == 1 || gdc.Operation == 2)
+                {
+                    if (gdc.Operation == 1)
+                    {
+                        saveFile();
+                    }
+
+                    foreach (Node node in Nodes)
+                    {
+                        eliminateNexetEdges(node);
+                    }
+                    Nodes = new List<Node>();
+                    justSaved = true;
+                }                
+            }
+            Invalidate();
+        }
     }//Form
 }//namespace
 
