@@ -16,12 +16,17 @@ namespace graphical_graph_editor
 
         List<Node> Nodes;
         List<Line> Lines;
+        Node selectedNode;
+
         Node selected = null;
+
         public Form1()
         {
             InitializeComponent();
             Nodes = new List<Node>();
             Lines = new List<Line>();
+            selectedNode = new Node();
+
         }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
@@ -38,6 +43,7 @@ namespace graphical_graph_editor
             {
                 rectangle = new Rectangle(node.X - 50, node.Y - 50, 100, 100);
                 graphics.FillEllipse(brush, rectangle);
+                pen = new Pen(node.Color, 5);
                 graphics.DrawEllipse(pen, node.X - 50, node.Y - 50, 100, 100);
             }
         }
@@ -47,41 +53,92 @@ namespace graphical_graph_editor
             int x, y;
             int find = 0;
             Node node = null;
-            foreach (Node oneNode in Nodes)
-            {
-                x = oneNode.X;
-                y = oneNode.Y;
-                if (e.X > x - 50 && e.X < x + 50 && e.Y > y - 50 && e.Y < y + 50)
-                {
-                    find = 1;
-                    node = oneNode;
-                }
-            }
 
-            if (find == 1)
+            if(e.Button == System.Windows.Forms.MouseButtons.Left)// if mouse button pressed is left
             {
-                if (selected== null)
+                foreach (Node oneNode in Nodes)
                 {
-                    MessageBox.Show("Selecting");
-                    selected = node;
+                    x = oneNode.X;
+                    y = oneNode.Y;
+                    if (e.X > x - 50 && e.X < x + 50 && e.Y > y - 50 && e.Y < y + 50)
+                    {
+                        find = 1;
+                        node = oneNode;
+                        selectedNode.Color = Color.Black;
+                    }
+                }
+                if (find == 1)
+                {                    
+                    if (selected == null)
+                    {
+                        //MessageBox.Show("Selecting");
+                        node.Color = Color.Blue;
+                        selectedNode = selected = node;                        
+                    }
+                    else
+                    {
+                        if (selected != node)
+                        {
+                            //MessageBox.Show("conecting nodes");
+                            Line linea = new Line(selected,node);
+                            Lines.Add(linea);
+                            selected = null;
+                        }
+                        else
+                        {
+                            selected = null;
+                            node.Color = Color.Black;
+                        }
+                    }
                 }
                 else
                 {
-                    if (selected != node)
-                    {
-                        MessageBox.Show("conecting nodes");
-                        Line linea = new Line(selected.X, selected.Y, node.X, node.Y, Nodes.IndexOf(selected), Nodes.IndexOf(node));
-                        Lines.Add(linea);
-                        selected = null;
-                    }
+                    node = new Node(e.X, e.Y);
+                    Nodes.Add(node);
                 }
             }
-            else
+            else // if mouse button pressed is right
             {
-                node = new Node(e.X, e.Y);
-                Nodes.Add(node);
+                foreach (Node oneNode in Nodes)
+                {
+                    x = oneNode.X;
+                    y = oneNode.Y;
+                    if (e.X > x - 50 && e.X < x + 50 && e.Y > y - 50 && e.Y < y + 50)
+                    {
+                        find = 1;
+                        node = oneNode;
+                    }
+                }
+                if (find == 1)
+                {
+                    if (selected != null)
+                    {
+                        eliminateNexetEdges(node);
+                        Nodes.Remove(node);
+                        selected = null;
+                    }
+                }   
             }
+
+            
+
+            
             Invalidate();
+        }
+
+
+        public void eliminateNexetEdges(Node node)
+        {
+            List <Line> newEdges = new List<Line>();
+
+           foreach( Line edge in Lines)
+            {
+                if(edge.Node1 != node && edge.Node2 != node)
+                {
+                    newEdges.Add(edge);
+                }
+            }
+            Lines = newEdges;
         }
 
         public void openFile()
@@ -89,8 +146,7 @@ namespace graphical_graph_editor
             string[] auxiliar;
             StreamReader sr = null;
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            //openFileDialog.DefaultExt = "txt";
-            //openFileDialog.Filter = "Text files|*.txt* ";
+
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 sr = new StreamReader(openFileDialog.FileName);
@@ -109,8 +165,8 @@ namespace graphical_graph_editor
                     int nodo1 = int.Parse(auxiliar[0]);
                     int nodo2 = int.Parse(auxiliar[1]);
 
-                    Line linea = new Line(Nodes[nodo1].X, Nodes[nodo1].Y, Nodes[nodo2].X, Nodes[nodo2].Y, nodo1, nodo2);
-                    Lines.Add(linea);
+                    //Line linea = new Line(Nodes[nodo1].X, Nodes[nodo1].Y, Nodes[nodo2].X, Nodes[nodo2].Y, nodo1, nodo2);
+                    //Lines.Add(linea);
                 }
                 sr.Close();
             }
@@ -128,50 +184,70 @@ namespace graphical_graph_editor
                 sw = new StreamWriter(saveFileDialog.FileName);
                 MessageBox.Show(saveFileDialog.FileName);
             }
-            foreach (Node nodo in Nodes)
+            foreach (Node node in Nodes)
             {
-                sw.WriteLine(nodo.X + "," + nodo.Y);
+                sw.WriteLine(node.X + "," + node.Y);
             }
             sw.WriteLine("Lines");
-            foreach (Line linea in Lines)
+            foreach (Line line in Lines)
             {
-                sw.WriteLine(linea.Node1 + "," + linea.Node2);
+                sw.WriteLine(line.Node1 + "," + line.Node2);
             }
             sw.Close();
         }
 
         public class Node
         {
+            Color color;
             int x, y;
+
+            int index;
+
+            public Node(int x, int y,int index)
+            {
+                this.X = x;
+                this.Y = y;
+                this.index = index;
+                color = Color.Black;
+            }
+
             public Node(int x, int y)
             {
                 this.X = x;
                 this.Y = y;
+                this.index = index;
+                color = Color.Black;
+            }
+
+            public Node()
+            {
             }
 
             public int X { get { return x; } set { x = value; } }
             public int Y { get { return y; } set { y = value; } }
+            public Color Color { get { return color; } set { color = value; } }
         }
 
         public class Line
         {
             int x1, y1, x2, y2, node1, node2;
-            public Line(int x1, int y1, int x2, int y2, int node1, int node2)
+
+            Node client = null;
+            Node server = null;
+            int remainingInt;
+
+            public Line(Node client, Node server)
             {
-                this.x1 = x1;
-                this.y1 = y1;
-                this.x2 = x2;
-                this.y2 = y2;
-                this.node1 = node1;
-                this.node2 = node2;
+                this.client = client;
+                this.server = server;
             }
 
-            public int X { get { return x1; } set { x1 = value; } }
-            public int Y { get { return y1; } set { y1 = value; } }
-            public int X2 { get { return x2; } set { x2 = value; } }
-            public int Y2 { get { return y2; } set { y2 = value; } }
-            public int Node1 { get { return node1; } set { node1 = value; } }
-            public int Node2 { get { return node2; } set { node2 = value; } }
+            public int X { get { return client.X; } }
+            public int Y { get { return client.Y; } }
+            public int X2 { get { return server.X; } }
+            public int Y2 { get { return server.Y; } }
+            public Node Node1 { get { return client; } }
+            public Node Node2 { get { return server; } }
         }
 
 
@@ -186,6 +262,11 @@ namespace graphical_graph_editor
             Lines.Clear();
             openFile();
             Invalidate();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
         }
     }//Form
 }//namespace
